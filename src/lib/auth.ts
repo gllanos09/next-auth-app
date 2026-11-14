@@ -30,6 +30,17 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   session: { strategy: "jwt" },
+  callbacks: {
+    // Guarda en el JWT con qué proveedor se autenticó el usuario
+    async jwt({ token, account }) {
+      if (account) token.provider = account.provider;
+      return token;
+    },
+    async session({ session, token }) {
+      session.provider = token.provider;
+      return session;
+    },
+  },
   pages: { signIn: "/signIn" },
   secret: process.env.NEXTAUTH_SECRET,
 };

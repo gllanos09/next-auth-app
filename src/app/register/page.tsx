@@ -3,6 +3,10 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import AuthShell from '@/components/AuthShell';
+
+const inputCls =
+  'w-full border border-line rounded-md px-3.5 py-2.5 text-ink bg-surface placeholder:text-muted/70 focus:border-cobalt transition-colors';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -17,7 +21,7 @@ export default function RegisterPage() {
     e.preventDefault();
     setError('');
     if (form.password !== form.confirm) {
-      setError('Las contraseñas no coinciden');
+      setError('Las contraseñas no coinciden. Escribe la misma en ambos campos.');
       return;
     }
     setLoading(true);
@@ -35,31 +39,63 @@ export default function RegisterPage() {
     }
   };
 
-  const input = 'border border-gray-300 rounded px-3 py-2 text-gray-800';
+  const field = (
+    name: 'name' | 'email' | 'password' | 'confirm',
+    label: string,
+    type: string,
+    placeholder: string,
+    minLength?: number,
+  ) => (
+    <label className="text-sm">
+      <span className="block mb-1.5 text-muted">{label}</span>
+      <input
+        name={name}
+        type={type}
+        placeholder={placeholder}
+        value={form[name]}
+        onChange={update}
+        required
+        minLength={minLength}
+        className={inputCls}
+      />
+    </label>
+  );
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-md w-96">
-        <h1 className="text-2xl text-gray-800 font-bold mb-6 text-center">Registro</h1>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-          <input name="name" placeholder="Nombre completo" value={form.name} onChange={update} required className={input} />
-          <input name="email" type="email" placeholder="Correo electrónico" value={form.email} onChange={update} required className={input} />
-          <input name="password" type="password" placeholder="Contraseña (mín. 8 caracteres)" value={form.password} onChange={update} required minLength={8} className={input} />
-          <input name="confirm" type="password" placeholder="Confirmar contraseña" value={form.confirm} onChange={update} required className={input} />
-          {error && <p className="rounded bg-red-100 text-red-700 text-sm p-2">{error}</p>}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-800 transition disabled:opacity-60"
+    <AuthShell
+      title="Crea tu credencial"
+      lead="Tu contraseña nunca se guarda en texto plano: antes de almacenarse se cifra con bcrypt, de modo que ni siquiera el servidor puede leerla."
+    >
+      <h2 className="font-display text-2xl font-semibold tracking-tight mb-5">
+        Registro
+      </h2>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+        {field('name', 'Nombre completo', 'text', 'Nombre y apellidos')}
+        {field('email', 'Correo electrónico', 'email', 'nombre@tecsup.edu.pe')}
+        {field('password', 'Contraseña', 'password', 'Mínimo 8 caracteres', 8)}
+        {field('confirm', 'Confirmar contraseña', 'password', 'Repite la contraseña')}
+        {error && (
+          <p
+            role="alert"
+            className="rounded-md bg-denied-bg text-denied text-sm px-3 py-2.5"
           >
-            {loading ? 'Registrando...' : 'Crear cuenta'}
-          </button>
-        </form>
-        <p className="text-sm text-gray-600 text-center mt-3">
-          ¿Ya tienes cuenta?{' '}
-          <Link href="/signIn" className="text-blue-600 hover:underline">Inicia sesión</Link>
-        </p>
-      </div>
-    </div>
+            {error}
+          </p>
+        )}
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-ink text-paper py-2.5 px-4 rounded-md hover:bg-cobalt transition-colors disabled:opacity-60 mt-1"
+        >
+          {loading ? 'Registrando…' : 'Crear cuenta'}
+        </button>
+      </form>
+      <p className="text-sm text-muted text-center mt-4">
+        ¿Ya tienes cuenta?{' '}
+        <Link href="/signIn" className="text-cobalt hover:underline">
+          Inicia sesión
+        </Link>
+      </p>
+    </AuthShell>
   );
 }

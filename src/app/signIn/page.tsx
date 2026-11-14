@@ -5,6 +5,10 @@ import Link from 'next/link';
 import { signIn } from 'next-auth/react';
 import { useSearchParams } from 'next/navigation';
 import { FaGoogle, FaGithub } from 'react-icons/fa';
+import AuthShell from '@/components/AuthShell';
+
+const inputCls =
+  'w-full border border-line rounded-md px-3.5 py-2.5 text-ink bg-surface placeholder:text-muted/70 focus:border-cobalt transition-colors';
 
 function LoginForm() {
   const params = useSearchParams();
@@ -41,81 +45,94 @@ function LoginForm() {
     }
   };
 
-  const input = 'border border-gray-300 rounded px-3 py-2 text-gray-800';
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-md w-96">
-        <h1 className="text-2xl text-gray-800 font-bold mb-6 text-center">
-          Sign In
-        </h1>
+    <AuthShell
+      title="Identifícate para continuar"
+      lead="El acceso al panel está restringido. Entra con tu correo y contraseña, o con tu cuenta de Google o GitHub mediante OAuth 2.0."
+    >
+      <h2 className="font-display text-2xl font-semibold tracking-tight mb-5">
+        Iniciar sesión
+      </h2>
 
-        {registered && (
-          <p className="mb-4 rounded bg-green-100 text-green-800 text-sm p-2 text-center">
-            Cuenta creada. Ahora inicia sesión.
-          </p>
-        )}
+      {registered && (
+        <p
+          role="status"
+          className="mb-4 rounded-md bg-granted-bg text-granted text-sm px-3 py-2.5"
+        >
+          Cuenta creada correctamente. Ahora inicia sesión.
+        </p>
+      )}
 
-        <form onSubmit={handleCredentials} className="flex flex-col gap-3">
+      <form onSubmit={handleCredentials} className="flex flex-col gap-3">
+        <label className="text-sm">
+          <span className="block mb-1.5 text-muted">Correo electrónico</span>
           <input
             type="email"
-            placeholder="Correo electrónico"
+            placeholder="nombre@tecsup.edu.pe"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className={input}
+            className={inputCls}
           />
+        </label>
+        <label className="text-sm">
+          <span className="block mb-1.5 text-muted">Contraseña</span>
           <input
             type="password"
-            placeholder="Contraseña"
+            placeholder="••••••••"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className={input}
+            className={inputCls}
           />
-          {error && (
-            <p className="rounded bg-red-100 text-red-700 text-sm p-2">{error}</p>
-          )}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-800 transition disabled:opacity-60"
+        </label>
+        {error && (
+          <p
+            role="alert"
+            className="rounded-md bg-denied-bg text-denied text-sm px-3 py-2.5"
           >
-            {loading ? 'Verificando...' : 'Iniciar sesión'}
-          </button>
-        </form>
+            {error}
+          </p>
+        )}
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-ink text-paper py-2.5 px-4 rounded-md hover:bg-cobalt transition-colors disabled:opacity-60 mt-1"
+        >
+          {loading ? 'Verificando…' : 'Entrar'}
+        </button>
+      </form>
 
-        <p className="text-sm text-gray-600 text-center mt-3">
-          ¿No tienes cuenta?{' '}
-          <Link href="/register" className="text-blue-600 hover:underline">
-            Regístrate
-          </Link>
-        </p>
+      <p className="text-sm text-muted text-center mt-4">
+        ¿No tienes cuenta?{' '}
+        <Link href="/register" className="text-cobalt hover:underline">
+          Regístrate
+        </Link>
+      </p>
 
-        <div className="flex items-center gap-2 my-5 text-gray-400 text-xs">
-          <span className="flex-1 h-px bg-gray-200" />
-          o continúa con
-          <span className="flex-1 h-px bg-gray-200" />
-        </div>
-
-        <div className="flex flex-col gap-3">
-          <button
-            onClick={handleGoogleSignIn}
-            className="w-full bg-gray-500 text-white py-2 px-4 rounded hover:bg-black transition flex items-center justify-center gap-2"
-          >
-            <FaGoogle />
-            Continue with Google
-          </button>
-          <button
-            onClick={handleGitHubSignIn}
-            className="w-full bg-gray-800 text-white py-2 px-4 rounded hover:bg-black transition flex items-center justify-center gap-2"
-          >
-            <FaGithub />
-            Continue with GitHub
-          </button>
-        </div>
+      <div className="flex items-center gap-3 my-5 text-muted text-xs">
+        <span className="flex-1 h-px bg-line" aria-hidden />
+        o continúa con
+        <span className="flex-1 h-px bg-line" aria-hidden />
       </div>
-    </div>
+
+      <div className="flex flex-col gap-2.5">
+        <button
+          onClick={handleGoogleSignIn}
+          className="w-full border border-line text-ink py-2.5 px-4 rounded-md hover:border-ink transition-colors flex items-center justify-center gap-2.5"
+        >
+          <FaGoogle aria-hidden />
+          Continue with Google
+        </button>
+        <button
+          onClick={handleGitHubSignIn}
+          className="w-full border border-line text-ink py-2.5 px-4 rounded-md hover:border-ink transition-colors flex items-center justify-center gap-2.5"
+        >
+          <FaGithub aria-hidden />
+          Continue with GitHub
+        </button>
+      </div>
+    </AuthShell>
   );
 }
 
